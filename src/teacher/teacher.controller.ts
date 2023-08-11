@@ -1,10 +1,13 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { CreateTeacherDto } from './dto/create-teacher.dto';
+import { TeacherService } from './teacher.service';
 
 @Controller('teacher')
 export class TeacherController {
+  constructor(private teacherService: TeacherService) {}
   @Post()
-  create() {
-    return 'This action adds a new teacher';
+  create(@Body() createTeacherDto: CreateTeacherDto) {
+    return this.teacherService.createTeacher(createTeacherDto);
   }
 
   @Get()
@@ -16,5 +19,4 @@ export class TeacherController {
   findOne(id: number) {
     return `This action returns a #${id} teacher`;
   }
-
 }
