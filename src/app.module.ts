@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TeacherModule } from './teacher/teacher.module';
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeacherModel } from './teacher/teacher.model';
+import { StudentModule } from './student/student.module';
 
 @Module({
   imports: [
-    TeacherModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -17,6 +17,8 @@ import { TeacherModel } from './teacher/teacher.model';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    StudentModule,
+    TeacherModule,
   ],
   controllers: [],
   providers: [],
