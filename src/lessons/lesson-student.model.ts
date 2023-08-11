@@ -5,8 +5,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn
 } from 'typeorm';
-import { StudentModel } from './student.model';
-import { LessonsModel } from '../lessons/lessons.model';
+import { StudentModel } from '../student/student.model';
+import { LessonsModel } from './lessons.model';
+
 
 @Entity('lesson-student')
 export class LessonStudentModel {

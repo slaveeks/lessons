@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { LessonsModel } from '../lessons/lessons.model';
-import { TeacherModel } from './teacher.model';
+import { TeacherModel } from '../teacher/teacher.model';
+import { LessonsModel } from './lessons.model';
 
 @Entity('lesson-teacher')
 export class LessonTeacherModel {
