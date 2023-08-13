@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, ValidationPipe } from "@nestjs/common";
 import { LessonsService } from './lessons.service';
 import { CreateLessonsDto } from './dto/create-lessons.dto';
 
@@ -7,7 +7,7 @@ export class LessonsController {
   constructor(private lessonsService: LessonsService) {}
 
   @Post()
-  create(@Body() createLessonsDto: CreateLessonsDto) {
+  create(@Body(new ValidationPipe()) createLessonsDto: CreateLessonsDto) {
     return this.lessonsService.createLessons(createLessonsDto);
   }
 }

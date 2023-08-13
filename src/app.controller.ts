@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, ValidationPipe } from "@nestjs/common";
 import { AppService } from './app.service';
 import { GetLessonsDto } from './lessons/dto/get-lessons.dto';
 
@@ -7,7 +7,7 @@ export class AppController {
   constructor(private appService: AppService) {}
 
   @Get()
-  getAll(@Query() query: GetLessonsDto) {
+  getAll(@Query(new ValidationPipe()) query: GetLessonsDto) {
     return this.appService.getAll(query);
   }
 }

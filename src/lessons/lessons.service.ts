@@ -43,10 +43,13 @@ export class LessonsService {
     const parsedFirstDate = parseISO(firstDate);
     const currentLessonDate = parsedFirstDate;
 
+    let teachers = [];
     /**
      * Get teachers by ids
      */
-    const teachers = await this.teacherService.getTeachersByIds(teacherIds);
+    if (teacherIds && teacherIds.length > 0) {
+      teachers = await this.teacherService.getTeachersByIds(teacherIds);
+    }
 
     /**
      * Create lessons array
@@ -201,7 +204,6 @@ export class LessonsService {
 
     query = query.offset(parsedLessonsPerPage * (parsedPage - 1));
     query = query.limit(parsedLessonsPerPage);
-    console.log(query.getSql());
     return await query.getMany();
   }
 }
