@@ -172,9 +172,9 @@ export class LessonsService {
       }
     }
 
-    if (parsedStudentsCount) {
+    if (parsedStudentsCount || parsedStudentsCount === 0) {
       query = query
-        .innerJoin(
+        .leftJoin(
           'lessons.lessonStudent',
           'students',
           'lessons.id = students.lessonId',
