@@ -6,6 +6,8 @@ import { StudentModule } from './student/student.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { StudentModel } from './student/student.model';
 import { LessonStudentModel } from './lessons/lesson-student.model';
+import { AppController } from './app.controller';
+import { AppService } from "./app.service";
 
 @Module({
   imports: [
@@ -16,11 +18,7 @@ import { LessonStudentModel } from './lessons/lesson-student.model';
       username: 'postgres',
       password: 'postgres',
       database: 'test',
-      entities: [
-        TeacherModel,
-        StudentModel,
-        LessonStudentModel,
-      ],
+      entities: [TeacherModel, StudentModel, LessonStudentModel],
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -28,7 +26,7 @@ import { LessonStudentModel } from './lessons/lesson-student.model';
     TeacherModule,
     LessonsModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

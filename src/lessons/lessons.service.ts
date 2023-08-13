@@ -6,6 +6,7 @@ import { LessonStudentModel } from './lesson-student.model';
 import { CreateLessonsDto } from './dto/create-lessons.dto';
 import { TeacherService } from '../teacher/teacher.service';
 import { parseISO, differenceInYears } from 'date-fns';
+import { GetLessonsDto } from './dto/get-lessons.dto';
 
 /**
  * Type for condition function
@@ -112,5 +113,90 @@ export class LessonsService {
 
     const createdLessons = await this.lessonsRepository.save(lessons);
     return createdLessons.map((lesson) => lesson.id);
+  }
+
+  async getLessons(getLessonsDto: GetLessonsDto) {
+    let parsedTeacherIds;
+    let parsedStudentsCount;
+    let parsedDate;
+    const { teacherIds, studentsCount, date, page, lessonsPerPage } = getLessonsDto;
+    const parsedPage = page || 1;
+    const parsedLessonsPerPage = lessonsPerPage || 5;
+    if (teacherIds) {
+      parsedTeacherIds = teacherIds.split(',').map((id) => +id);
+    }
+
+    console.log(getLessonsDto)
+
+    if (studentsCount) {
+      parsedStudentsCount = studentsCount.split(',');
+      parsedStudentsCount =
+        parsedStudentsCount.length > 1
+          ? parsedStudentsCount
+          : parsedStudentsCount[0];
+    }
+
+    if (date) {
+      parsedDate = date.split(',');
+      parsedDate = parsedDate.length > 1 ? parsedDate : parsedDate[0];
+    }
+
+    let query = await this.lessonsRepository.createQueryBuilder('lessons');
+    if (parsedTeacherIds) {
+      console.log(parsedTeacherIds);
+      query = query
+        .innerJoin('lessons.teachers', 'teachers')
+        .where('teachers.id IN (:...teacherIds)', {
+          teacherIds: parsedTeacherIds,
+        });
+    }
+
+    if (getLessonsDto.status) {
+      console.log(Boolean(getLessonsDto.status));
+      query = query.andWhere('lessons.status = :status', {
+        status: Boolean(getLessonsDto.status),
+      });
+    }
+
+    if (parsedDate) {
+      if (Array.isArray(parsedDate)) {
+        console.log(parsedDate[1]);
+        query = query.andWhere('lessons.date BETWEEN :firstDate AND :lastDate', {
+          firstDate: parsedDate[0],
+          lastDate: parsedDate[1],
+        });
+      } else {
+        query = query.andWhere('lessons.date = :date', {
+          date: parsedDate,
+        });
+      }
+    }
+
+    if (parsedStudentsCount) {
+      query = query
+        .innerJoin(
+          'lessons.lessonStudent',
+          'students',
+          'lessons.id = students.lessonId',
+        )
+        .groupBy('lessons.id');
+      if (Array.isArray(parsedStudentsCount)) {
+        query = query.having('COUNT(students.studentId) BETWEEN :min AND :max', {
+          min: parsedStudentsCount[0],
+          max: parsedStudentsCount[1],
+        });
+      } else {
+        query = query.having('COUNT(students.studentId) = :count', {
+          count: Number(parsedStudentsCount),
+        });
+      }
+    }
+
+    query = query.offset(
+      parsedLessonsPerPage * (parsedPage - 1),
+    );
+    query = query.limit(parsedLessonsPerPage);
+    console.log(query.getSql());
+    return await query.getMany();
   }
 }
