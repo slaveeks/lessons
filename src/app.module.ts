@@ -6,7 +6,6 @@ import { StudentModule } from './student/student.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { StudentModel } from './student/student.model';
 import { LessonStudentModel } from './lessons/lesson-student.model';
-import { LessonTeacherModel } from './lessons/lesson-teacher.model';
 
 @Module({
   imports: [
@@ -21,7 +20,6 @@ import { LessonTeacherModel } from './lessons/lesson-teacher.model';
         TeacherModel,
         StudentModel,
         LessonStudentModel,
-        LessonTeacherModel,
       ],
       autoLoadEntities: true,
       synchronize: true,

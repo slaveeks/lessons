@@ -8,5 +8,6 @@ import { TeacherModel } from './teacher.model';
   imports: [TypeOrmModule.forFeature([TeacherModel])],
   controllers: [TeacherController],
   providers: [TeacherService],
+  exports: [TeacherService],
 })
 export class TeacherModule {}

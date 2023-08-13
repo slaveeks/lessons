@@ -1,27 +1,29 @@
 import {
   Column,
   Entity,
-  JoinColumn,
-  OneToOne,
+  JoinColumn, ManyToOne,
   PrimaryGeneratedColumn
-} from 'typeorm';
+} from "typeorm";
 import { StudentModel } from '../student/student.model';
 import { LessonsModel } from './lessons.model';
-
 
 @Entity('lesson-student')
 export class LessonStudentModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => StudentModel)
-  @JoinColumn({ name: 'studentId' })
-  studentId: number;
-
-  @OneToOne(() => LessonsModel)
-  @JoinColumn({ name: 'lessonId' })
+  @Column()
   lessonId: number;
+
+  @Column()
+  studentId: number;
 
   @Column({ type: 'boolean', default: false })
   visited: boolean;
+
+  @ManyToOne(() => LessonsModel, (lesson) => lesson.lessonStudent)
+  lesson: LessonsModel;
+
+  @ManyToOne(() => StudentModel, (student) => student.lessonStudent)
+  student: StudentModel;
 }

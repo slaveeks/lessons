@@ -1,9 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum LessonStatus {
-  DONE = 1,
-  NOT_DONE = 0,
-}
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { TeacherModel } from "../teacher/teacher.model";
+import { StudentModel } from "../student/student.model";
+import { LessonStudentModel } from "./lesson-student.model";
 
 @Entity('lessons')
 export class LessonsModel {
@@ -16,6 +14,15 @@ export class LessonsModel {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'enum', enum: LessonStatus, default: LessonStatus.NOT_DONE })
-  status: LessonStatus;
+  @Column({ type: 'boolean' })
+  status: boolean;
+
+  @ManyToMany(() => TeacherModel)
+  @JoinTable({
+    name: 'lesson-teacher',
+  })
+  teachers: TeacherModel[];
+
+  @OneToMany(() => LessonStudentModel, (lessonStudent) => lessonStudent.lesson)
+  lessonStudent: LessonStudentModel[];
 }

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { LessonStudentModel } from '../lessons/lesson-student.model';
 
 @Entity('student')
 export class StudentModel {
@@ -7,4 +8,7 @@ export class StudentModel {
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
+
+  @OneToMany(() => LessonStudentModel, (lessonStudent) => lessonStudent.student)
+  lessonStudent: LessonStudentModel[];
 }
