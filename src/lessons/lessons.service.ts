@@ -119,14 +119,15 @@ export class LessonsService {
     let parsedTeacherIds;
     let parsedStudentsCount;
     let parsedDate;
-    const { teacherIds, studentsCount, date, page, lessonsPerPage } = getLessonsDto;
+    const { teacherIds, studentsCount, date, page, lessonsPerPage } =
+      getLessonsDto;
     const parsedPage = page || 1;
     const parsedLessonsPerPage = lessonsPerPage || 5;
     if (teacherIds) {
       parsedTeacherIds = teacherIds.split(',').map((id) => +id);
     }
 
-    console.log(getLessonsDto)
+    console.log(getLessonsDto);
 
     if (studentsCount) {
       parsedStudentsCount = studentsCount.split(',');
@@ -161,10 +162,13 @@ export class LessonsService {
     if (parsedDate) {
       if (Array.isArray(parsedDate)) {
         console.log(parsedDate[1]);
-        query = query.andWhere('lessons.date BETWEEN :firstDate AND :lastDate', {
-          firstDate: parsedDate[0],
-          lastDate: parsedDate[1],
-        });
+        query = query.andWhere(
+          'lessons.date BETWEEN :firstDate AND :lastDate',
+          {
+            firstDate: parsedDate[0],
+            lastDate: parsedDate[1],
+          },
+        );
       } else {
         query = query.andWhere('lessons.date = :date', {
           date: parsedDate,
@@ -181,10 +185,13 @@ export class LessonsService {
         )
         .groupBy('lessons.id');
       if (Array.isArray(parsedStudentsCount)) {
-        query = query.having('COUNT(students.studentId) BETWEEN :min AND :max', {
-          min: parsedStudentsCount[0],
-          max: parsedStudentsCount[1],
-        });
+        query = query.having(
+          'COUNT(students.studentId) BETWEEN :min AND :max',
+          {
+            min: parsedStudentsCount[0],
+            max: parsedStudentsCount[1],
+          },
+        );
       } else {
         query = query.having('COUNT(students.studentId) = :count', {
           count: Number(parsedStudentsCount),
@@ -192,9 +199,7 @@ export class LessonsService {
       }
     }
 
-    query = query.offset(
-      parsedLessonsPerPage * (parsedPage - 1),
-    );
+    query = query.offset(parsedLessonsPerPage * (parsedPage - 1));
     query = query.limit(parsedLessonsPerPage);
     console.log(query.getSql());
     return await query.getMany();

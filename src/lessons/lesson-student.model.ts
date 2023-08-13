@@ -1,9 +1,10 @@
 import {
   Column,
   Entity,
-  JoinColumn, ManyToOne,
-  PrimaryGeneratedColumn
-} from "typeorm";
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { StudentModel } from '../student/student.model';
 import { LessonsModel } from './lessons.model';
 

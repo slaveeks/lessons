@@ -1,7 +1,14 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { TeacherModel } from "../teacher/teacher.model";
-import { StudentModel } from "../student/student.model";
-import { LessonStudentModel } from "./lesson-student.model";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { TeacherModel } from '../teacher/teacher.model';
+import { StudentModel } from '../student/student.model';
+import { LessonStudentModel } from './lesson-student.model';
 
 @Entity('lessons')
 export class LessonsModel {

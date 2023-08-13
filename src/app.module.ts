@@ -7,7 +7,7 @@ import { LessonsModule } from './lessons/lessons.module';
 import { StudentModel } from './student/student.model';
 import { LessonStudentModel } from './lessons/lesson-student.model';
 import { AppController } from './app.controller';
-import { AppService } from "./app.service";
+import { AppService } from './app.service';
 
 @Module({
   imports: [
