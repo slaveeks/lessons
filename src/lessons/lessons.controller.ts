@@ -1,4 +1,4 @@
-import { Body, Controller, Post, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { LessonsService } from './lessons.service';
 import { CreateLessonsDto } from './dto/create-lessons.dto';
 

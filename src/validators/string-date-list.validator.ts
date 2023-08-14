@@ -1,4 +1,8 @@
-import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
+import {
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 
 @ValidatorConstraint({ name: 'DateStringArray', async: false })
 export class DateStringArrayValidator implements ValidatorConstraintInterface {
