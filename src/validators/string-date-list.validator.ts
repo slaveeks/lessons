@@ -2,11 +2,8 @@ import { ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface 
 
 @ValidatorConstraint({ name: 'DateStringArray', async: false })
 export class DateStringArrayValidator implements ValidatorConstraintInterface {
-  validate(value: string) {
-    // Разбиваем строку по запятым и проверяем каждую дату
-    const dateStrings = value.split(',');
-
-    for (const dateString of dateStrings) {
+  validate(value: any[]) {
+    for (const dateString of value) {
       if (!this.isValidDate(dateString.trim())) {
         return false;
       }

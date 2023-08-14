@@ -7,7 +7,14 @@ export class AppController {
   constructor(private appService: AppService) {}
 
   @Get()
-  getAll(@Query(new ValidationPipe()) query: GetLessonsDto) {
+  getAll(@Query(new ValidationPipe(
+    {
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true
+      }
+    }
+  )) query: GetLessonsDto) {
     return this.appService.getAll(query);
   }
 }

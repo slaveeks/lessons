@@ -9,6 +9,12 @@ import { parseISO, differenceInYears } from 'date-fns';
 import { GetLessonsDto } from './dto/get-lessons.dto';
 
 /**
+ * Set defaults for lessons per page and page
+ */
+const DefaultLessonsPerPage = 5;
+const DefaultPage = 1;
+
+/**
  * Type for condition function
  */
 type ConditionType = () => boolean;
@@ -118,120 +124,149 @@ export class LessonsService {
     return createdLessons.map((lesson) => lesson.id);
   }
 
+  /**
+   * Get lessons with pagination and filters
+   * @param getLessonsDto - DTO with filters
+   */
   async getLessons(getLessonsDto: GetLessonsDto) {
-    let parsedTeacherIds;
-    let parsedStudentsCount;
-    let parsedDate;
-    const { teacherIds, studentsCount, date, page, lessonsPerPage } =
-      getLessonsDto;
-    const parsedPage = page || 1;
-    const parsedLessonsPerPage = lessonsPerPage || 5;
-    if (teacherIds) {
-      parsedTeacherIds = teacherIds.split(',').map((id) => +id);
-    }
+    const {
+      teacherIds = [],
+      studentsCount = [],
+      date = [],
+      status,
+      lessonsPerPage = DefaultLessonsPerPage,
+      page = DefaultPage,
+    } = getLessonsDto;
 
-    console.log(getLessonsDto);
-
-    if (studentsCount) {
-      parsedStudentsCount = studentsCount.split(',');
-      parsedStudentsCount =
-        parsedStudentsCount.length > 1
-          ? parsedStudentsCount
-          : parsedStudentsCount[0];
-    }
-
-    if (date) {
-      parsedDate = date.split(',');
-      parsedDate = parsedDate.length > 1 ? parsedDate : parsedDate[0];
-    }
-
+    /**
+     * Create query builder for lessons
+     */
     let query = this.lessonsRepository.createQueryBuilder('lessons');
-    query = query.addSelect('COUNT(visits."lessonId")', 'lessons_visitCount');
-    if (parsedTeacherIds) {
-      query = query
-        .innerJoinAndSelect('lessons.teachers', 'teachers')
-        .where('teachers.id IN (:...teacherIds)', {
-          teacherIds: parsedTeacherIds,
-        })
-        .addGroupBy('teachers.id');
-    } else {
-      query = query.leftJoinAndSelect('lessons.teachers', 'teachers');
-      query = query.addGroupBy('teachers.id');
-    }
 
-    if (getLessonsDto.status) {
+    /**
+     * Add select for count of visits
+     */
+    query = query.addSelect('COUNT(visits."lessonId")', 'lessons_visitCount');
+
+    /**
+     * Left join with teachers table to show teachers in response
+     */
+    query = query.leftJoinAndSelect('lessons.teachers', 'teachers');
+
+    /**
+     * Filter by teacher ids, if they are provided in request
+     */
+    if (teacherIds.length > 0) {
+      query = query.where('teachers.id IN (:...teacherIds)', {
+        teacherIds: teacherIds,
+      });
+    }
+    query = query.addGroupBy('teachers.id');
+
+    /**
+     * Filter lessons by status, if it is provided in request, it can be 0, so we check it
+     */
+    if (status || status === 0) {
       query = query.andWhere('lessons.status = :status', {
-        status: Boolean(getLessonsDto.status),
+        status: getLessonsDto.status,
       });
     }
 
-    if (parsedDate) {
-      if (Array.isArray(parsedDate)) {
-        console.log(parsedDate[1]);
+    /**
+     * Filter lessons by date, if it is provided in request
+     */
+    if (date.length > 0) {
+      /**
+       * If dates array length more than 1, it means that we have date range, else we have only one date
+       */
+      if (date.length > 1) {
         query = query.andWhere(
           'lessons.date BETWEEN :firstDate AND :lastDate',
           {
-            firstDate: parsedDate[0],
-            lastDate: parsedDate[1],
+            firstDate: date[0],
+            lastDate: date[1],
           },
         );
       } else {
         query = query.andWhere('lessons.date = :date', {
-          date: parsedDate,
+          date: date[0],
         });
       }
     }
 
-    query = query.leftJoinAndSelect('lessons.lessonStudent', 'ls', 'lessons.id = ls.lessonId')
+    /**
+     * Left join with lesson-student table to show lessonStudent in response, then left join with student table to show student in response
+     */
+    query = query
+      .leftJoinAndSelect(
+        'lessons.lessonStudent',
+        'ls',
+        'lessons.id = ls.lessonId',
+      )
       .leftJoinAndSelect('ls.student', 'student');
 
-    if (parsedStudentsCount || parsedStudentsCount === 0) {
-      if (Array.isArray(parsedStudentsCount)) {
-        query = query.having(
-          'COUNT(ls.studentId) BETWEEN :min AND :max',
-          {
-            min: parsedStudentsCount[0],
-            max: parsedStudentsCount[1],
-          },
-        );
+    /**
+     * Check if students count array is provided in request, it can be range or one number
+     */
+    if (studentsCount.length > 0) {
+      if (studentsCount.length > 1) {
+        query = query.having('COUNT(ls.studentId) BETWEEN :min AND :max', {
+          min: studentsCount[0],
+          max: studentsCount[1],
+        });
       } else {
         query = query.having('COUNT(ls.studentId) = :count', {
-          count: Number(parsedStudentsCount),
+          count: studentsCount[0],
         });
       }
     }
 
-    query = query.leftJoin((subQuery) => {
-      return subQuery
-        .select('ls.lessonId', 'lessonId')
-        .from('lesson-student', 'ls')
-        .where('ls.visited = true')
-    }, 'visits', 'lessons.id = visits."lessonId"');
+    /**
+     * Add select for count of visits
+     */
+    query = query.leftJoin(
+      (subQuery) => {
+        return subQuery
+          .select('ls.lessonId', 'lessonId')
+          .from('lesson-student', 'ls')
+          .where('ls.visited = true');
+      },
+      'visits',
+      'lessons.id = visits."lessonId"',
+    );
 
     query = query.addGroupBy('lessons.id');
     query = query.addGroupBy('ls.id');
     query = query.addGroupBy('student.id');
 
-    query = query.offset(parsedLessonsPerPage * (parsedPage - 1));
-    query = query.limit(parsedLessonsPerPage);
+    query = query.offset(lessonsPerPage * (page - 1));
+    query = query.limit(lessonsPerPage);
+
+    /**
+     * Get lessons from database
+     */
     const lessons = await query.getMany();
 
+    /**
+     * Parse visit count to number, because it is string after query
+     */
     const lessonsWithNumberVisitCount = lessons.map((lesson) => {
       lesson.visitCount = Number(lesson.visitCount);
 
       return lesson;
     });
 
-    const lessonsWithStudents = lessonsWithNumberVisitCount.map((lesson) => {
+    /**
+     * Add students array to lesson object, remove lessonStudent array
+     */
+    return lessonsWithNumberVisitCount.map((lesson) => {
       const students = lesson.lessonStudent.map((ls) => ls.student);
       delete lesson.lessonStudent;
 
       return {
         ...lesson,
         students: students,
-      }
+      };
     });
-
-    return lessonsWithStudents;
   }
 }
