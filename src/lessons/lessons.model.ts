@@ -21,8 +21,12 @@ export class LessonsModel {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'boolean' })
-  status: boolean;
+  @Column({
+    type: 'int',
+    nullable: true,
+    default: 0,
+  })
+  status: number;
 
   @Column('int', {
     nullable: true,

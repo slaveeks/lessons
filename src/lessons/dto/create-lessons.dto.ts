@@ -5,7 +5,7 @@ import {
   IsString,
   Length,
   Validate,
-} from "class-validator";
+} from 'class-validator';
 import { DateStringValidator } from '../../validators/date.validator';
 
 export class CreateLessonsDto {
@@ -16,7 +16,7 @@ export class CreateLessonsDto {
   @IsNumber(
     {},
     {
-      each: true
+      each: true,
     },
   )
   teacherIds: number[];
