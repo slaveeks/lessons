@@ -9,14 +9,4 @@ export class TeacherController {
   create(@Body() createTeacherDto: CreateTeacherDto) {
     return this.teacherService.createTeacher(createTeacherDto);
   }
-
-  @Get()
-  findAll() {
-    return `This action returns all teacher`;
-  }
-
-  @Get(':id')
-  findOne(id: number) {
-    return `This action returns a #${id} teacher`;
-  }
 }
