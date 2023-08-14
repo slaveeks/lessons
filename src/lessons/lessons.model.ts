@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TeacherModel } from '../teacher/teacher.model';
-import { StudentModel } from '../student/student.model';
 import { LessonStudentModel } from './lesson-student.model';
 
 @Entity('lessons')
