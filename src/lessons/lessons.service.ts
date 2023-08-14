@@ -145,18 +145,21 @@ export class LessonsService {
       parsedDate = parsedDate.length > 1 ? parsedDate : parsedDate[0];
     }
 
-    let query = await this.lessonsRepository.createQueryBuilder('lessons');
+    let query = this.lessonsRepository.createQueryBuilder('lessons');
+    query = query.addSelect('COUNT(visits."lessonId")', 'lessons_visitCount');
     if (parsedTeacherIds) {
-      console.log(parsedTeacherIds);
       query = query
-        .innerJoin('lessons.teachers', 'teachers')
+        .innerJoinAndSelect('lessons.teachers', 'teachers')
         .where('teachers.id IN (:...teacherIds)', {
           teacherIds: parsedTeacherIds,
-        });
+        })
+        .addGroupBy('teachers.id');
+    } else {
+      query = query.leftJoinAndSelect('lessons.teachers', 'teachers');
+      query = query.addGroupBy('teachers.id');
     }
 
     if (getLessonsDto.status) {
-      console.log(Boolean(getLessonsDto.status));
       query = query.andWhere('lessons.status = :status', {
         status: Boolean(getLessonsDto.status),
       });
@@ -179,31 +182,56 @@ export class LessonsService {
       }
     }
 
+    query = query.leftJoinAndSelect('lessons.lessonStudent', 'ls', 'lessons.id = ls.lessonId')
+      .leftJoinAndSelect('ls.student', 'student');
+
     if (parsedStudentsCount || parsedStudentsCount === 0) {
-      query = query
-        .leftJoin(
-          'lessons.lessonStudent',
-          'students',
-          'lessons.id = students.lessonId',
-        )
-        .groupBy('lessons.id');
       if (Array.isArray(parsedStudentsCount)) {
         query = query.having(
-          'COUNT(students.studentId) BETWEEN :min AND :max',
+          'COUNT(ls.studentId) BETWEEN :min AND :max',
           {
             min: parsedStudentsCount[0],
             max: parsedStudentsCount[1],
           },
         );
       } else {
-        query = query.having('COUNT(students.studentId) = :count', {
+        query = query.having('COUNT(ls.studentId) = :count', {
           count: Number(parsedStudentsCount),
         });
       }
     }
 
+    query = query.leftJoin((subQuery) => {
+      return subQuery
+        .select('ls.lessonId', 'lessonId')
+        .from('lesson-student', 'ls')
+        .where('ls.visited = true')
+    }, 'visits', 'lessons.id = visits."lessonId"');
+
+    query = query.addGroupBy('lessons.id');
+    query = query.addGroupBy('ls.id');
+    query = query.addGroupBy('student.id');
+
     query = query.offset(parsedLessonsPerPage * (parsedPage - 1));
     query = query.limit(parsedLessonsPerPage);
-    return await query.getMany();
+    const lessons = await query.getMany();
+
+    const lessonsWithNumberVisitCount = lessons.map((lesson) => {
+      lesson.visitCount = Number(lesson.visitCount);
+
+      return lesson;
+    });
+
+    const lessonsWithStudents = lessonsWithNumberVisitCount.map((lesson) => {
+      const students = lesson.lessonStudent.map((ls) => ls.student);
+      delete lesson.lessonStudent;
+
+      return {
+        ...lesson,
+        students: students,
+      }
+    });
+
+    return lessonsWithStudents;
   }
 }

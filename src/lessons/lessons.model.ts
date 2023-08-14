@@ -24,6 +24,12 @@ export class LessonsModel {
   @Column({ type: 'boolean' })
   status: boolean;
 
+  @Column('int', {
+    nullable: true,
+    select: false,
+  })
+  visitCount: number;
+
   @ManyToMany(() => TeacherModel)
   @JoinTable({
     name: 'lesson-teacher',

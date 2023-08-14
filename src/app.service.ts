@@ -6,6 +6,8 @@ import { GetLessonsDto } from './lessons/dto/get-lessons.dto';
 export class AppService {
   constructor(private lessonsService: LessonsService) {}
   async getAll(getAllDto: GetLessonsDto) {
-    return await this.lessonsService.getLessons(getAllDto);
+    const lessons = await this.lessonsService.getLessons(getAllDto);
+    console.log(lessons);
+    return lessons;
   }
 }
