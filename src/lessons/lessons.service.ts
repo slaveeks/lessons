@@ -15,6 +15,12 @@ const DefaultLessonsPerPage = 5;
 const DefaultPage = 1;
 
 /**
+ * Set max lessons count and max years range
+ */
+const MaxLessonsCount = 300;
+const MaxYearsRange = 1;
+
+/**
  * Type for condition function
  */
 type ConditionType = () => boolean;
@@ -31,31 +37,23 @@ export class LessonsService {
 
   async createLessons(createLessonsDto: CreateLessonsDto) {
     /**
-     * Set max lessons count and max years range
-     */
-    const maxLessonsCount = 300;
-    const maxYearsRange = 1;
-
-    /**
      * Get data from DTO
      */
-    const teacherIds = createLessonsDto.teacherIds;
-    const title = createLessonsDto.title;
-    const days = createLessonsDto.days;
-    const firstDate = createLessonsDto.firstDate;
-    const lastDate = createLessonsDto.lastDate;
-    let lessonsCount = createLessonsDto.lessonsCount;
+    const {
+      title,
+      teacherIds = [],
+      firstDate,
+      lastDate,
+      lessonsCount,
+      days,
+    } = createLessonsDto;
 
     const parsedFirstDate = parseISO(firstDate);
     const currentLessonDate = parsedFirstDate;
-
-    let teachers = [];
     /**
      * Get teachers by ids
      */
-    if (teacherIds && teacherIds.length > 0) {
-      teachers = await this.teacherService.getTeachersByIds(teacherIds);
-    }
+    const teachers = await this.teacherService.getTeachersByIds(teacherIds);
 
     /**
      * Create lessons array
@@ -71,18 +69,18 @@ export class LessonsService {
       /**
        * If lessons count is more than max lessons count, set lessons count to max lessons count
        */
-      lessonsCount =
-        lessonsCount <= maxLessonsCount ? lessonsCount : maxLessonsCount;
-      condition = () => lessons.length < lessonsCount;
+      const maxLessonsCount =
+        lessonsCount <= MaxLessonsCount ? lessonsCount : MaxLessonsCount;
+      condition = () => lessons.length < maxLessonsCount;
     } else {
       let parsedLastDate = parseISO(lastDate);
 
       /**
        * If last date is more than 1 year, set last date to 1 year from first date
        */
-      if (differenceInYears(parsedLastDate, parsedFirstDate) >= maxYearsRange) {
+      if (differenceInYears(parsedLastDate, parsedFirstDate) >= MaxYearsRange) {
         parsedLastDate = new Date(
-          parsedFirstDate.getFullYear() + maxYearsRange,
+          parsedFirstDate.getFullYear() + MaxYearsRange,
           parsedFirstDate.getMonth(),
           parsedFirstDate.getDate(),
         );
@@ -91,7 +89,7 @@ export class LessonsService {
        * Set condition to check last date
        */
       condition = () =>
-        currentLessonDate <= parsedLastDate && lessons.length < maxLessonsCount;
+        currentLessonDate <= parsedLastDate && lessons.length < MaxLessonsCount;
     }
     /**
      * Lessons count is more priority than last date, so we check it first
