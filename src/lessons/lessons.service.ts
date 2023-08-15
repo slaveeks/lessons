@@ -108,7 +108,6 @@ export class LessonsService {
         lessons.push({
           title,
           date: formattedDate,
-          status: false,
           teachers,
         });
       }
