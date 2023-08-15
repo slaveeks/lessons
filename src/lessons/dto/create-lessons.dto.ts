@@ -7,6 +7,7 @@ import {
   Validate,
 } from 'class-validator';
 import { DateStringValidator } from '../../validators/date.validator';
+import { DaysOfWeekArray } from '../../validators/days-of-week-array';
 
 export class CreateLessonsDto {
   /**
@@ -29,7 +30,6 @@ export class CreateLessonsDto {
   title: string;
   /**
    * @example [1,2,3]
-   * TODO: add validation for days
    */
   @IsNumber(
     {},
@@ -38,6 +38,7 @@ export class CreateLessonsDto {
       message: 'Days must be a number',
     },
   )
+  @Validate(DaysOfWeekArray)
   days: number[];
   /**
    * @example "2021-01-01"
