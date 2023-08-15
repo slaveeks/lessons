@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 
@@ -6,7 +6,7 @@ import { CreateStudentDto } from './dto/create-student.dto';
 export class StudentController {
   constructor(private studentService: StudentService) {}
   @Post()
-  create(@Body() createStudentDto: CreateStudentDto) {
+  create(@Body(new ValidationPipe()) createStudentDto: CreateStudentDto) {
     return this.studentService.createStudent(createStudentDto);
   }
 }

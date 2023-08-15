@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TeacherModel } from '../teacher/teacher.model';
-import { StudentModel } from '../student/student.model';
 import { LessonStudentModel } from './lesson-student.model';
 
 @Entity('lessons')
@@ -21,8 +20,12 @@ export class LessonsModel {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'boolean' })
-  status: boolean;
+  @Column({
+    type: 'int',
+    nullable: true,
+    default: 0,
+  })
+  status: number;
 
   @Column('int', {
     nullable: true,

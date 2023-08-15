@@ -4,15 +4,15 @@ import {
   ValidationArguments,
 } from 'class-validator';
 
-@ValidatorConstraint({ name: 'numberArray', async: false })
-export class NumberArrayValidator implements ValidatorConstraintInterface {
-  validate(value: any[]) {
+@ValidatorConstraint({ name: 'daysOfWeekArray', async: false })
+export class DaysOfWeekArray implements ValidatorConstraintInterface {
+  validate(value: any) {
     if (!Array.isArray(value)) {
       return false;
     }
 
     for (const num of value) {
-      if (isNaN(num) || typeof num !== 'number') {
+      if (isNaN(num) || num < 0 || num > 6) {
         return false;
       }
     }
@@ -21,6 +21,6 @@ export class NumberArrayValidator implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `The field ${args.property} must be an array of valid numbers`;
+    return `The field ${args.property} must be an array of valid days of week`;
   }
 }

@@ -8,16 +8,19 @@ import { StudentModel } from './student/student.model';
 import { LessonStudentModel } from './lessons/lesson-student.model';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import * as process from 'process';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'test',
+      host: process.env.POSTGRES_HOST || 'localhost',
+      port: process.env.POSTGRES_PORT
+        ? Number(process.env.POSTGRES_PORT)
+        : 5432,
+      username: process.env.POSTGRES_USER || 'postgres',
+      password: process.env.POSTGRES_PASSWORD || 'postgres',
+      database: process.env.POSTGRES_DB || 'app',
       entities: [TeacherModel, StudentModel, LessonStudentModel],
       autoLoadEntities: true,
       synchronize: true,

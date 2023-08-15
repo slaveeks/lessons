@@ -1,35 +1,62 @@
-import { IsIn, IsNumber, IsOptional, Validate } from "class-validator";
-import { DateStringArrayValidator } from "../../validators/string-date-list.validator";
-import { StringNumberListValidator } from "../../validators/string-number-list.validator";
-import { Transform } from "class-transformer";
+import { IsIn, IsNumber, IsOptional, Validate } from 'class-validator';
+import { DateStringArrayValidator } from '../../validators/string-date-list.validator';
+import { StringNumberListValidator } from '../../validators/string-number-list.validator';
+import { Transform } from 'class-transformer';
 
 export class GetLessonsDto {
+  /**
+   * @example 2021-01-01,2021-01-02
+   */
   @IsOptional()
   @Validate(DateStringArrayValidator)
-  date: string;
+  @Transform(({ value }) => {
+    return value.split(',');
+  })
+  date: string[];
+  /**
+   * @example 0
+   */
+  @IsNumber({}, { message: 'Status must be a number' })
   @IsOptional()
+  @IsIn([0, 1], { message: 'Status must be 0 or 1' })
   @Transform(({ value }) => {
     return Number(value);
   })
-  @IsNumber({}, { message: 'Status must be a number' })
-  @IsIn([0, 1], { message: 'Status must be 0 or 1' })
   status: number;
+  /**
+   * @example 1,2,3
+   */
   @IsOptional()
   @Validate(StringNumberListValidator)
+  @Transform(({ value }) => {
+    return value.split(',').map(Number);
+  })
   teacherIds: string;
+  /**
+   * @example 1,2,3
+   */
   @IsOptional()
   @Validate(StringNumberListValidator)
-  studentsCount: string;
+  @Transform(({ value }) => {
+    return value.split(',').map(Number);
+  })
+  studentsCount: number[];
+  /**
+   * @example 1
+   */
   @IsOptional()
   @Transform(({ value }) => {
     return Number(value);
   })
   @IsNumber({}, { message: 'Page must be a number' })
-  page: number = 1;
+  page: number;
+  /**
+   * @example 5
+   */
   @IsOptional()
   @Transform(({ value }) => {
     return Number(value);
   })
   @IsNumber({}, { message: 'Lessons per page value must be a number' })
-  lessonsPerPage: number = 5;
+  lessonsPerPage: number;
 }
