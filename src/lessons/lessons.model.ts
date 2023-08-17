@@ -35,7 +35,7 @@ export class LessonsModel {
 
   @ManyToMany(() => TeacherModel)
   @JoinTable({
-    name: 'lesson-teacher',
+    name: 'lesson-teachers',
   })
   teachers: TeacherModel[];
 

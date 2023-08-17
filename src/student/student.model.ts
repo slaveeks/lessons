@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { LessonStudentModel } from '../lessons/lesson-student.model';
 
-@Entity('student')
+@Entity('students')
 export class StudentModel {
   @PrimaryGeneratedColumn()
   id: number;

@@ -225,7 +225,7 @@ export class LessonsService {
       (subQuery) => {
         return subQuery
           .select('ls.lessonId', 'lessonId')
-          .from('lesson-student', 'ls')
+          .from('lesson-students', 'ls')
           .where('ls.visited = true');
       },
       'visits',
