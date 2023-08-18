@@ -141,11 +141,6 @@ export class LessonsService {
     let query = this.lessonsRepository.createQueryBuilder('lessons');
 
     /**
-     * Add select for count of visits
-     */
-    query = query.addSelect('COUNT(visits."lessonId")', 'lessons_visitCount');
-
-    /**
      * Left join with teachers table to show teachers in response
      */
     query = query.leftJoinAndSelect('lessons.teachers', 'teachers');
@@ -221,23 +216,16 @@ export class LessonsService {
     /**
      * Add select for count of visits
      */
-    query = query.leftJoin(
-      (subQuery) => {
-        return subQuery
-          .select('ls.lessonId', 'lessonId')
-          .from('lesson-students', 'ls')
-          .where('ls.visited = true');
-      },
-      'visits',
-      'lessons.id = visits."lessonId"',
+    query = query.loadRelationCountAndMap(
+      'lessons.visitCount',
+      'lessons.lessonStudent',
+      'ls',
+      qb => qb.andWhere('ls.visited = :visited', { visited: true })
     );
 
     query = query.addGroupBy('lessons.id');
     query = query.addGroupBy('ls.id');
     query = query.addGroupBy('student.id');
-
-    console.log(lessonsPerPage * (page - 1));
-    console.log(lessonsPerPage);
 
     query = query.skip(lessonsPerPage * (page - 1));
     query = query.take(lessonsPerPage);
@@ -246,20 +234,10 @@ export class LessonsService {
      * Get lessons from database
      */
     const lessons = await query.getMany();
-
-    /**
-     * Parse visit count to number, because it is string after query
-     */
-    const lessonsWithNumberVisitCount = lessons.map((lesson) => {
-      lesson.visitCount = Number(lesson.visitCount);
-
-      return lesson;
-    });
-
     /**
      * Add students array to lesson object, remove lessonStudent array
      */
-    return lessonsWithNumberVisitCount.map((lesson) => {
+    return lessons.map((lesson) => {
       const students = lesson.lessonStudent.map((ls) => ls.student);
       delete lesson.lessonStudent;
 
