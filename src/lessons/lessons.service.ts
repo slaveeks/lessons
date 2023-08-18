@@ -236,8 +236,11 @@ export class LessonsService {
     query = query.addGroupBy('ls.id');
     query = query.addGroupBy('student.id');
 
-    query = query.offset(lessonsPerPage * (page - 1));
-    query = query.limit(lessonsPerPage);
+    console.log(lessonsPerPage * (page - 1));
+    console.log(lessonsPerPage);
+
+    query = query.skip(lessonsPerPage * (page - 1));
+    query = query.take(lessonsPerPage);
 
     /**
      * Get lessons from database
