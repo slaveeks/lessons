@@ -59,6 +59,12 @@ $ npm run start:prod
 $ docker-compose up --build
 ```
 
+## Database data for testing
+
+You can use database dump for testing, it's located in `./dumps/dump.sql`
+It contains 22 lessons, 6 teachers, 6 students.
+And it contains relations between them.
+
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
