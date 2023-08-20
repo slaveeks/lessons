@@ -14,7 +14,7 @@ import * as process from 'process';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.POSTGRES_HOST || 'localhost',
+      host: process.env.POSTGRES_HOST || 'db',
       port: process.env.POSTGRES_PORT
         ? Number(process.env.POSTGRES_PORT)
         : 5432,
