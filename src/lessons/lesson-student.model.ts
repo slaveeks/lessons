@@ -14,7 +14,7 @@ export class LessonStudentModel {
   studentId: number;
 
   @Column({ type: 'boolean', default: false })
-  visited: boolean;
+  visit: boolean;
 
   @ManyToOne(() => LessonsModel, (lesson) => lesson.lessonStudent)
   lesson: LessonsModel;

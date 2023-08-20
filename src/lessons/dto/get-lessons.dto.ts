@@ -1,4 +1,4 @@
-import { IsIn, IsNumber, IsOptional, Validate } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, Min, Validate } from "class-validator";
 import { DateStringArrayValidator } from '../../validators/string-date-list.validator';
 import { StringNumberListValidator } from '../../validators/string-number-list.validator';
 import { Transform } from 'class-transformer';
@@ -49,6 +49,7 @@ export class GetLessonsDto {
     return Number(value);
   })
   @IsNumber({}, { message: 'Page must be a number' })
+  @Min(1, { message: 'Page must be greater than 0' })
   page: number;
   /**
    * @example 5

@@ -220,7 +220,7 @@ export class LessonsService {
       'lessons.visitCount',
       'lessons.lessonStudent',
       'ls',
-      qb => qb.andWhere('ls.visited = :visited', { visited: true })
+      qb => qb.andWhere('ls.visit = :visit', { visit: true })
     );
 
     query = query.addGroupBy('lessons.id');
@@ -238,7 +238,12 @@ export class LessonsService {
      * Add students array to lesson object, remove lessonStudent array
      */
     return lessons.map((lesson) => {
-      const students = lesson.lessonStudent.map((ls) => ls.student);
+      const students = lesson.lessonStudent.map((ls) => {
+        return {
+          ...ls.student,
+          visit: ls.visit,
+        };
+      });
       delete lesson.lessonStudent;
 
       return {
