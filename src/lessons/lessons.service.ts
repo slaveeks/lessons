@@ -220,7 +220,7 @@ export class LessonsService {
       'lessons.visitCount',
       'lessons.lessonStudent',
       'ls',
-      qb => qb.andWhere('ls.visit = :visit', { visit: true })
+      (qb) => qb.andWhere('ls.visit = :visit', { visit: true }),
     );
 
     query = query.addGroupBy('lessons.id');
