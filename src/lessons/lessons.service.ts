@@ -226,6 +226,7 @@ export class LessonsService {
     query = query.addGroupBy('lessons.id');
     query = query.addGroupBy('ls.id');
     query = query.addGroupBy('student.id');
+    query = query.addOrderBy('lessons.id', 'ASC');
 
     query = query.skip(lessonsPerPage * (page - 1));
     query = query.take(lessonsPerPage);
