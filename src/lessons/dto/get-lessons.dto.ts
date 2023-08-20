@@ -1,4 +1,4 @@
-import { IsIn, IsNumber, IsOptional, Min, Validate } from "class-validator";
+import { IsIn, IsNumber, IsOptional, IsPositive, Min, Validate } from "class-validator";
 import { DateStringArrayValidator } from '../../validators/string-date-list.validator';
 import { StringNumberListValidator } from '../../validators/string-number-list.validator';
 import { Transform } from 'class-transformer';
@@ -59,5 +59,6 @@ export class GetLessonsDto {
     return Number(value);
   })
   @IsNumber({}, { message: 'Lessons per page value must be a number' })
+  @IsPositive({ message: 'Lessons per page value must be greater than 0' })
   lessonsPerPage: number;
 }
